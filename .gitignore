@@ -33,6 +33,7 @@ MANIFEST
 
 # Prod
 *.prod*
+**/prod-config/*
 prod-config/Caddyfile
 prod-config/authelia/configuration.yml
 prod-config/authelia/users_database.yml
