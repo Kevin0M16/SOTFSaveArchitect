@@ -27,8 +27,8 @@ share/python-wheels/
 MANIFEST
 
 # Docker
-Dockerfile
-docker-compose.yml
+#Dockerfile
+#docker-compose.yml
 .dockerignore
 
 # Prod

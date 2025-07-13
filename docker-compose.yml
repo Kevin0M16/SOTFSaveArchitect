@@ -1,0 +1,13 @@
+# docker-compose.yml
+services:
+  sotf-save-architect:
+    image: k0m16/sotf-save-architect:latest
+    container_name: sotf-save-architect
+    ports:
+      - "5000:5000"
+    volumes:
+      # Creates an 'uploads' folder here to store temporary files.
+      - ./uploads:/app/uploads
+    env_file:
+      - .env
+    restart: unless-stopped
