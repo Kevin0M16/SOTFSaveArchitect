@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Debug Files - SOTF Save Architect{% endblock %}
+{% block page_title %}SOTF Save Architect - Debug & Temp Files{% endblock %}
+
+{% block content %}
+<div class="sotf-breadcrumb">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('options') }}">Tools</a></li>
+            <li class="breadcrumb-item active">Debug Files</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="sotf-card">
+    <div class="sotf-card-header">
+        <i class="bi bi-bug"></i> Debug & Diagnostic Files
+    </div>
+    <div class="card-body">
+        {% if debug_files %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-file-earmark"></i> File</th>
+                            <th><i class="bi bi-tag"></i> Type</th>
+                            <th><i class="bi bi-hdd"></i> Size</th>
+                            <th><i class="bi bi-gear"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in debug_files %}
+                        <tr>
+                            <td>
+                                <code class="text-muted">{{ file.name }}</code>
+                            </td>
+                            <td>
+                                <span class="badge {% if file.type == 'Edit Session' %}badge-sotf-success{% elif file.type == 'Import Structures' %}badge-sotf-warning{% else %}bg-secondary{% endif %}">
+                                    {{ file.type }}
+                                </span>
+                            </td>
+                            <td>{{ "%.1f"|format(file.size/1024) }} KB</td>
+                            <td>
+                                <a href="{{ url_for('view_debug_file', filename=file.name) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <h5 class="text-muted mt-3">No debug files found</h5>
+                <p class="text-muted">Debug files will appear here after editing or importing.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

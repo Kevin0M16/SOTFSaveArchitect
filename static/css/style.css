@@ -1,0 +1,328 @@
+/* SOTF Save Architect - Red & Dark Theme */
+:root {
+    --sotf-red: #dc2626;
+    --sotf-dark-red: #b91c1c;
+    --sotf-dark: #1f2937;
+    --sotf-darker: #111827;
+    --sotf-light: #f9fafb;
+    --sotf-border: #e5e7eb;
+    --sotf-text: #1f2937;
+    --sotf-muted: #6b7280;
+    --sotf-metallic: #374151;
+}
+
+body {
+    background-color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--sotf-text);
+    line-height: 1.6;
+}
+
+/* Header with red theme */
+.sotf-header {
+    background: linear-gradient(135deg, var(--sotf-dark) 0%, var(--sotf-darker) 100%);
+    color: white;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 3px solid var(--sotf-red);
+    box-shadow: 0 2px 10px rgba(220, 38, 38, 0.1);
+}
+
+.sotf-header h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sotf-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Clickable logo link */
+.sotf-logo-link {
+    display: inline-block;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.sotf-logo-link:hover {
+    background-color: rgba(220, 38, 38, 0.2);
+    transform: scale(1.05);
+}
+
+.sotf-logo-link:hover .sotf-logo {
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+}
+
+/* Red-themed buttons */
+.btn-sotf-primary {
+    background: linear-gradient(135deg, var(--sotf-red) 0%, var(--sotf-dark-red) 100%);
+    border-color: var(--sotf-red);
+    color: white;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+}
+
+.btn-sotf-primary:hover {
+    background: linear-gradient(135deg, var(--sotf-dark-red) 0%, #991b1b 100%);
+    border-color: var(--sotf-dark-red);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+}
+
+.btn-sotf-secondary {
+    background-color: white;
+    border: 2px solid var(--sotf-red);
+    color: var(--sotf-red);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-sotf-secondary:hover {
+    background-color: var(--sotf-red);
+    border-color: var(--sotf-red);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Cards with subtle red accents */
+.sotf-card {
+    background: white;
+    border: 1px solid var(--sotf-border);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-top: 3px solid var(--sotf-red);
+}
+
+.sotf-card-header {
+    background: linear-gradient(135deg, var(--sotf-light) 0%, #f3f4f6 100%);
+    border-bottom: 1px solid var(--sotf-border);
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: var(--sotf-text);
+    border-radius: 8px 8px 0 0;
+}
+
+.sotf-card-header i {
+    color: var(--sotf-red);
+    margin-right: 0.5rem;
+}
+
+/* Upload area with red theme */
+.sotf-upload-area {
+    border: 2px dashed var(--sotf-border);
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background-color: #fafbfc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.sotf-upload-area:hover,
+.sotf-upload-area.drag-over {
+    border-color: var(--sotf-red);
+    background-color: rgba(220, 38, 38, 0.05);
+}
+
+.sotf-upload-area.drag-over {
+    border-style: solid;
+    background-color: rgba(220, 38, 38, 0.1);
+    border-color: var(--sotf-dark-red);
+}
+
+.sotf-upload-area input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.sotf-upload-content {
+    pointer-events: none;
+}
+
+/* Code areas with dark theme */
+.sotf-code {
+    background-color: var(--sotf-darker);
+    border: 1px solid var(--sotf-metallic);
+    border-radius: 6px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #e5e7eb;
+}
+
+.sotf-code:focus {
+    border-color: var(--sotf-red);
+    box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25);
+}
+
+/* Breadcrumb */
+.sotf-breadcrumb {
+    background: linear-gradient(135deg, var(--sotf-light) 0%, #f3f4f6 100%);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--sotf-border);
+    border-left: 4px solid var(--sotf-red);
+}
+
+.sotf-breadcrumb .breadcrumb {
+    margin: 0;
+    background: none;
+    padding: 0;
+}
+
+.sotf-breadcrumb .breadcrumb-item a {
+    color: var(--sotf-red);
+    text-decoration: none;
+}
+
+.sotf-breadcrumb .breadcrumb-item a:hover {
+    color: var(--sotf-dark-red);
+}
+
+/* File list */
+.sotf-file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sotf-file-list li {
+    border-bottom: 1px solid var(--sotf-border);
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.sotf-file-list li:hover {
+    border-left-color: var(--sotf-red);
+}
+
+.sotf-file-list li:last-child {
+    border-bottom: none;
+}
+
+.sotf-file-list a {
+    display: block;
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: var(--sotf-text);
+    transition: all 0.2s ease;
+}
+
+.sotf-file-list a:hover {
+    background-color: rgba(220, 38, 38, 0.05);
+    color: var(--sotf-red);
+}
+
+/* Badges with red theme */
+.badge-sotf-success {
+    background-color: var(--sotf-red);
+    color: white;
+}
+
+.badge-sotf-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.badge-sotf-danger {
+    background-color: #dc2626;
+    color: white;
+}
+
+/* Tables */
+.table th {
+    border-top: none;
+    background-color: var(--sotf-light);
+    font-weight: 600;
+    color: var(--sotf-text);
+    border-bottom: 2px solid var(--sotf-red);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(220, 38, 38, 0.05);
+}
+
+/* Form controls */
+.form-control:focus {
+    border-color: var(--sotf-red);
+    box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--sotf-red);
+    border-color: var(--sotf-red);
+}
+
+/* Alert styling */
+.alert-info {
+    background-color: rgba(220, 38, 38, 0.1);
+    border-color: var(--sotf-red);
+    color: var(--sotf-dark-red);
+}
+
+.alert-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+/* Text colors */
+.text-success {
+    color: var(--sotf-red) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sotf-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .sotf-logo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sotf-upload-area {
+        padding: 2rem 1rem;
+    }
+}
+
+/* Loading state */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Subtle animations */
+.sotf-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-sotf-primary:active,
+.btn-sotf-secondary:active {
+    transform: translateY(0);
+}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ filename }} - SOTF Save Architect{% endblock %}
+{% block page_title %}SOTF Save Architect - Debug File Viewer{% endblock %}
+
+{% block content %}
+<div class="sotf-breadcrumb">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('options') }}">Tools</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('debug_files') }}">Debug Files</a></li>
+            <li class="breadcrumb-item active">{{ filename }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="sotf-card">
+    <div class="sotf-card-header">
+        <i class="bi bi-file-earmark-code"></i> {{ filename }}
+        <span class="badge bg-secondary ms-2">{{ file_type }}</span>
+    </div>
+    <div class="card-body p-0">
+        <pre class="sotf-code m-0 p-3" style="max-height: 70vh; overflow-y: auto; border-radius: 0;">{{ content }}</pre>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ url_for('debug_files') }}" class="btn btn-sotf-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Debug Files
+    </a>
+</div>
+{% endblock %}

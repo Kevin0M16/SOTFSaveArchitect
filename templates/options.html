@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Options - SOTF Save Architect{% endblock %}
+{% block page_title %}SOTF Save Architect - Save Tools{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-tools"></i> Available Tools
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a href="{{ url_for('filelist') }}" class="btn btn-sotf-primary btn-lg">
+                                <i class="bi bi-file-earmark-code"></i>
+                                <div class="mt-2">
+                                    <strong>Edit Raw JSON</strong><br>
+                                    <small class="text-light">Advanced editing</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a href="{{ url_for('import_base_choose') }}" class="btn btn-sotf-secondary btn-lg">
+                                <i class="bi bi-building"></i>
+                                <div class="mt-2">
+                                    <strong>Import Base</strong><br>
+                                    <small>Merge community builds</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-gear"></i> Session Tools
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('debug_files') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-bug"></i> Debug Files
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-upload"></i> New Upload
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sotf-card mt-3">
+            <div class="sotf-card-header">
+                <i class="bi bi-info-circle"></i> Tips
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li><i class="bi bi-lightbulb text-warning"></i> Always backup your saves</li>
+                    <li><i class="bi bi-lightbulb text-warning"></i> Test on single-player first</li>
+                    <li><i class="bi bi-lightbulb text-warning"></i> Check debug files if issues occur</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

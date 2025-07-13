@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Import Base - SOTF Save Architect{% endblock %}
+{% block page_title %}SOTF Save Architect - Import Community Base{% endblock %}
+
+{% block content %}
+<div class="sotf-breadcrumb">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('options') }}">Tools</a></li>
+            <li class="breadcrumb-item active">Import Base</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-building"></i>Select Base File
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data" id="baseUploadForm">
+                    <div class="sotf-upload-area" id="baseUploadArea">
+                        <input type="file" name="basefile" accept=".json" required id="baseFileInput">
+                        <div class="sotf-upload-content">
+                            <i class="bi bi-file-earmark-code fs-1 text-muted mb-3 d-block"></i>
+                            <h5>Drop your base JSON file here</h5>
+                            <p class="text-muted mb-3">or click to browse for community base files</p>
+                            <div class="btn btn-sotf-secondary">
+                                <i class="bi bi-folder2-open"></i> Choose JSON File
+                            </div>
+                        </div>
+                    </div>
+                    <div id="baseFileInfo" class="mt-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="bi bi-file-earmark-code"></i> <strong>Selected:</strong> <span id="baseFileName"></span>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-sotf-primary btn-lg">
+                                <i class="bi bi-arrow-right"></i> Next: Select Structures
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="mt-4">
+                    <h6><i class="bi bi-info-circle"></i> About Base Files:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle text-success me-2"></i>JSON files containing building structures</li>
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Downloaded from community sites</li>
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Will be merged with your existing save</li>
+                        <li><i class="bi bi-check-circle text-success me-2"></i>You can select which structures to import</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('baseUploadArea');
+    const fileInput = document.getElementById('baseFileInput');
+    const fileInfo = document.getElementById('baseFileInfo');
+    const fileName = document.getElementById('baseFileName');
+    const uploadForm = document.getElementById('baseUploadForm');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop area when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Handle dropped files
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    // Handle file selection via click
+    fileInput.addEventListener('change', handleFileSelect, false);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        uploadArea.classList.add('drag-over');
+    }
+
+    function unhighlight(e) {
+        uploadArea.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect();
+        }
+    }
+
+    function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (file) {
+            if (file.name.toLowerCase().endsWith('.json')) {
+                fileName.textContent = file.name;
+                fileInfo.style.display = 'block';
+                uploadArea.style.display = 'none';
+            } else {
+                alert('Please select a JSON file.');
+                fileInput.value = '';
+            }
+        }
+    }
+
+    // Show loading state on form submission
+    uploadForm.addEventListener('submit', function() {
+        const submitBtn = uploadForm.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+        submitBtn.disabled = true;
+        document.body.classList.add('loading');
+    });
+});
+</script>
+{% endblock %}

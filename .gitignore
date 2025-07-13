@@ -26,6 +26,36 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Prod
+*.prod*
+prod-config/Caddyfile
+prod-config/authelia/configuration.yml
+prod-config/authelia/users_database.yml
+
+# Flask
+instance/
+.webassets-cache
+
+# Temporary Uploads
+archive/
+bases/
+uploads/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

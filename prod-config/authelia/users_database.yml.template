@@ -1,0 +1,44 @@
+# =============================================================================
+#          Authelia User Database Template | SOTF Save Architect
+# =============================================================================
+#
+# This file defines the users who can log into the application.
+#
+# --- IMPORTANT: HOW TO USE THIS TEMPLATE ---
+#
+# 1. COPY THIS FILE:
+#    In your terminal, run the following command from the project root:
+#    cp prod-config/authelia/users_database.yml.template prod-config/authelia/users_database.yml
+#
+# 2. GENERATE A SECURE PASSWORD HASH:
+#    Run this command in your terminal, replacing 'YourNewSecurePassword'
+#    with a strong, unique password.
+#
+#    docker run --rm authelia/authelia:latest authelia hash-password 'YourNewSecurePassword'
+#
+# 3. REPLACE THE PLACEHOLDER:
+#    Copy the entire output from the command above (it will start with '$argon2id...')
+#    and paste it below, replacing the placeholder password for the 'admin' user.
+#
+# =============================================================================
+
+users:
+  admin:
+    displayname: "Admin"
+    # DANGER: This is a placeholder and WILL NOT WORK. You MUST replace it.
+    password: "$argon2id$v=19$m=65536,t=3,p=4$THIS_IS_A_PLACEHOLDER_...$PASTE_YOUR_REAL_HASH_HERE"
+    email: admin@example.com
+    groups:
+      - admins
+
+  # --- EXAMPLE: ADDING ANOTHER USER (OPTIONAL) ---
+  #
+  # To add more users, just copy the block above and modify it.
+  #
+  # another_user:
+  #   displayname: "Kelvin"
+  #   # Generate a new hash for this user's password.
+  #   password: "$argon2id$v=19$m=...another_hash..."
+  #   email: kelvin@example.com
+  #   groups:
+  #     - users

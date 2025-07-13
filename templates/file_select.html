@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Select File - SOTF Save Architect{% endblock %}
+{% block page_title %}SOTF Save Architect - Select File to Edit{% endblock %}
+
+{% block content %}
+<div class="sotf-breadcrumb">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('options') }}">Tools</a></li>
+            <li class="breadcrumb-item active">Select File</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-files"></i> JSON Files in Save
+            </div>
+            <div class="card-body p-0">
+                <ul class="sotf-file-list">
+                    {% for f in files %}
+                    <li>
+                        <a href="{{ url_for('edit_json', fname=f) }}">
+                            <i class="bi bi-file-earmark-code me-2"></i>
+                            {{ f }}
+                            <i class="bi bi-chevron-right float-end"></i>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-exclamation-triangle"></i> Important
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <small>
+                        <strong>Large files</strong> may take time to load. 
+                        Use "Download for External Editing" for very large JSON files.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

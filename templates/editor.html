@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+  
+{% block title %}Edit {{ fname }} - SOTF Save Architect{% endblock %}
+{% block page_title %}SOTF Save Architect - JSON Editor{% endblock %}
+  
+{% block content %}
+<div class="sotf-breadcrumb">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('options') }}">Tools</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('filelist') }}">Files</a></li>
+            <li class="breadcrumb-item active">{{ fname }}</li>
+        </ol>
+    </nav>
+</div>
+  
+<div class="row">
+    <div class="col-md-8">
+        <!-- Browser Editor -->
+        <div class="sotf-card mb-4">
+            <div class="sotf-card-header">
+                <i class="bi bi-code-slash"></i> Browser Editor
+                <span class="badge badge-sotf-success ms-2">Small Files</span>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <textarea id="json-textarea" name="jtext" rows="25" class="form-control sotf-code">{{ raw_json }}</textarea>
+                    
+                    <div id="size-warning" class="alert alert-danger mt-3" style="display: none;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Content is too large for browser submission!</strong>
+                        <p class="mb-0 small">
+                            The expanded text exceeds the safe limit (1.5 MB). To prevent server errors, please use the "Download JSON" and "Upload Edited File" method instead.
+                        </p>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <button id="submit-button" type="submit" class="btn btn-sotf-primary">
+                            <i class="bi bi-download"></i> Download Modified Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- File Upload Editor -->
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-upload"></i> Upload Edited File
+                <span class="badge badge-sotf-warning ms-2">Large / Complex Files</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    This is the safe and recommended way to apply your changes.
+                </p>
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="file" name="edited_file" accept=".json" class="form-control mb-3" required>
+                    <div class="d-grid">
+                        <button type="submit" name="upload_mode" class="btn btn-sotf-primary">
+                            <i class="bi bi-upload"></i> Upload & Create New Save File
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-download"></i> 1. Download for Editing
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">Click here to download the JSON file to edit in your preferred editor.</p>
+                <div class="d-grid">
+                    <a href="{{ url_for('download_json', fname=fname) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Download JSON
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="sotf-card mt-3">
+            <div class="sotf-card-header">
+                <i class="bi bi-lightbulb"></i> Tips
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li><i class="bi bi-check-circle text-success"></i> Validate JSON before uploading</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Keep original structure intact</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Test changes in single-player first</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const jsonTextarea = document.getElementById('json-textarea');
+    const submitButton = document.getElementById('submit-button');
+    const sizeWarning = document.getElementById('size-warning');
+    
+    if (!jsonTextarea || !submitButton || !sizeWarning) {
+        return;
+    }
+
+    // --- THIS IS THE FIX ---
+    // Set a conservative limit of 2.0 MB to create a safety margin.
+    const SIZE_LIMIT_BYTES = 1.5 * 1024 * 1024;
+
+    function checkContentSize() {
+        const byteLength = new TextEncoder().encode(jsonTextarea.value).length;
+
+        if (byteLength > SIZE_LIMIT_BYTES) {
+            submitButton.disabled = true;
+            submitButton.title = 'This content is too large to submit from the browser.';
+            sizeWarning.style.display = 'block';
+        } else {
+            submitButton.disabled = false;
+            submitButton.title = '';
+            sizeWarning.style.display = 'none';
+        }
+    }
+    checkContentSize();
+    jsonTextarea.addEventListener('input', checkContentSize);
+});
+</script>
+{% endblock %}
