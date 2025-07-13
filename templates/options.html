@@ -12,24 +12,35 @@
             </div>
             <div class="card-body p-4">
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-12">
                         <div class="d-grid">
-                            <a href="{{ url_for('filelist') }}" class="btn btn-sotf-primary btn-lg">
-                                <i class="bi bi-file-earmark-code"></i>
+                            <a href="{{ url_for('filelist') }}" class="btn btn-sotf-secondary btn-lg p-3">
+                                <i class="bi bi-file-earmark-code fs-2"></i>
                                 <div class="mt-2">
-                                    <strong>Edit Raw JSON</strong><br>
-                                    <small class="text-light">Advanced editing</small>
+                                    <strong>Advanced JSON Editor</strong><br>
+                                    <small>Directly edit any save file</small>
                                 </div>
                             </a>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="d-grid">
-                            <a href="{{ url_for('import_base_choose') }}" class="btn btn-sotf-secondary btn-lg">
-                                <i class="bi bi-building"></i>
+                            <a href="{{ url_for('manage_structures') }}" class="btn btn-sotf-primary btn-lg p-3">
+                                <i class="bi bi-hammer fs-2"></i>
                                 <div class="mt-2">
-                                    <strong>Import Base</strong><br>
-                                    <small>Merge community builds</small>
+                                    <strong>Manage Structures</strong><br>
+                                    <small class="text-light">View & Delete Your Builds</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a href="{{ url_for('import_base_choose') }}" class="btn btn-sotf-secondary btn-lg p-3">
+                                <i class="bi bi-box-arrow-in-down fs-2"></i>
+                                <div class="mt-2">
+                                    <strong>Import Community Base</strong><br>
+                                    <small>Merge External Builds</small>
                                 </div>
                             </a>
                         </div>

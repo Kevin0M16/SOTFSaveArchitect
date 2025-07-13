@@ -15,7 +15,7 @@ def is_json_string(s):
     return (
         isinstance(s, str)
         and ((s.strip().startswith("{") and s.strip().endswith("}"))
-             or (s.strip().startswith("[") and s.strip().endswith("]")))
+                or (s.strip().startswith("[") and s.strip().endswith("]")))
     )
 
 def deep_unstringify(obj):
@@ -244,9 +244,19 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB limit
 UPLOAD_DIR = 'uploads'
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+@app.context_processor
+def inject_session_data():
+    """Make session data available to all templates."""
+    return dict(
+        original_filename=session.get('original_filename'),
+        game_stats=session.get('game_stats')
+    )
 
 @app.route('/', methods=['GET'])
 def index():
+    # Clear session data for a new upload
+    session.pop('original_filename', None)
+    session.pop('game_stats', None)
     return render_template('index.html')
 
 
@@ -261,12 +271,44 @@ def upload():
     save_path = os.path.join(UPLOAD_DIR, f'{uid}.zip')
     file.save(save_path)
 
+    game_stats = {}
     with zipfile.ZipFile(save_path) as zf:
         json_files = [f for f in zf.namelist() if f.endswith('.json')]
+        
+        # --- NEW: Extract stats and parent folder ---
+        display_name = file.filename
+        if json_files:
+            # Get the directory part of the first file in the list
+            parent_folder = os.path.dirname(json_files[0])
+            if parent_folder:
+                display_name = f"{parent_folder}/{file.filename}"
+
+        # Find and parse GameStateSaveData.json for stats
+        for f in json_files:
+            if 'gamestatesavedata.json' in f.lower():
+                try:
+                    raw_game_state = zf.read(f).decode('utf-8')
+                    game_state_data = json.loads(raw_game_state)
+                    
+                    # --- FIX: Unstringify the data before accessing it ---
+                    unstringified_data = deep_unstringify(game_state_data)
+                    state = unstringified_data.get("Data", {}).get("GameState", {})
+                    
+                    game_stats['Days'] = state.get('GameDays')
+                    game_stats['Hours'] = state.get('GameHours')
+                    game_stats['Type'] = state.get('GameType')
+                    game_stats['Crash Site'] = state.get('CrashSite', 'N/A').title()
+
+                except Exception as e:
+                    print(f"Could not parse GameStateSaveData.json: {e}")
+                break
 
     session['zip_filename'] = save_path
     session['json_files'] = json_files
     session['uid'] = uid
+    session['original_filename'] = display_name
+    session['game_stats'] = game_stats
+    
     return render_template('options.html', files=json_files)
 
 @app.route('/edit/<path:fname>', methods=['GET', 'POST'])
@@ -442,12 +484,21 @@ def options():
 def import_base_choose():
     if request.method == 'GET':
         return render_template('import_base_choose.html')
+
     basefile = request.files.get('basefile')
-    if not basefile:
-        flash("No base file uploaded!")
-        return redirect(url_for('options'))
+    if not basefile or not basefile.filename:
+        flash("No base file was selected. Please choose a file.", "warning")
+        return redirect(url_for('import_base_choose'))
+
     try:
-        base_json = json.load(basefile)
+        # Read the file content into a string to be safe
+        basefile_content = basefile.read().decode('utf-8')
+        if not basefile_content:
+            flash("The uploaded file is empty.", "error")
+            return redirect(url_for('import_base_choose'))
+        
+        base_json = json.loads(basefile_content)
+        
         # Use helper to extract structures list and meta
         structure_candidates, base_meta = extract_structures_from_any(base_json)
 
@@ -458,6 +509,7 @@ def import_base_choose():
             if 'construction' in f.lower():
                 constructions_fname = f
                 break
+        
         existing_struct_positions = set()
         if constructions_fname and os.path.exists(zip_filename):
             with zipfile.ZipFile(zip_filename) as zf:
@@ -493,7 +545,7 @@ def import_base_choose():
             )
             s['is_duplicate'] = (struct_key in existing_struct_positions)
 
-        # Store to temp and session (as before)
+        # Store to temp and session
         base_temp_id = str(uuid.uuid4())
         structs_path = os.path.join(UPLOAD_DIR, f"{base_temp_id}_structs.json")
         meta_path = os.path.join(UPLOAD_DIR, f"{base_temp_id}_meta.json")
@@ -501,10 +553,22 @@ def import_base_choose():
             json.dump(structure_candidates, f)
         with open(meta_path, "w", encoding="utf-8") as f:
             json.dump(base_meta, f)
+        
         session['base_temp_id'] = base_temp_id
-        return redirect(url_for('import_base_select'))
+        
+        # Redirect to the correct page based on the button clicked
+        if 'edit_and_import' in request.form:
+            return redirect(url_for('view_and_edit_structures'))
+        else:
+            return redirect(url_for('import_base_select'))
+            
+    except json.JSONDecodeError as e:
+        flash(f"Invalid JSON format. The file could not be parsed. Error: {e}", "error")
+        return redirect(url_for('import_base_choose'))
     except Exception as e:
-        return f"Invalid base file: {e}", 400
+        flash(f"An unexpected error occurred: {e}", "error")
+        return redirect(url_for('import_base_choose'))
+
 
 @app.route('/import_base_select', methods=['GET', 'POST'])
 def import_base_select():
@@ -603,7 +667,7 @@ def import_base_finish():
         if cstructs[tid] is None:
             cstructs[tid] = []
         elif not isinstance(cstructs[tid], list):
-            cstructs[tid] = []   
+            cstructs[tid] = []    
         
         existing_len = len(cstructs[tid])
         import_count = len(structures)
@@ -736,12 +800,130 @@ def view_debug_file(filename):
             file_type = "Text"
         
         return render_template('view_debug_file.html', 
-                             filename=filename, 
-                             content=content, 
-                             file_type=file_type)
+                               filename=filename, 
+                               content=content, 
+                               file_type=file_type)
     except Exception as e:
         flash(f"Error reading file: {e}")
         return redirect(url_for('debug_files'))
+
+@app.route('/manage_structures')
+def manage_structures():
+    zip_filename = session.get('zip_filename')
+    if not zip_filename or not os.path.isfile(zip_filename):
+        flash("Could not find an uploaded ZIP file. Please start again.", "error")
+        return redirect(url_for('index'))
+
+    # Find the constructions file
+    constructions_fname = None
+    for f in session.get('json_files', []):
+        if 'constructions' in f.lower() and f.endswith('.json'):
+            constructions_fname = f
+            break
     
+    if not constructions_fname:
+        flash("Could not find 'ConstructionsSaveData.json' in your save file.", "error")
+        return redirect(url_for('options'))
+
+    try:
+        with zipfile.ZipFile(zip_filename) as zf:
+            raw_json = zf.read(constructions_fname).decode('utf-8')
+            json_data = json.loads(raw_json)
+
+        # Use the helper to get a flat list of structures and group them
+        structures, _ = extract_structures_from_any(json_data)
+        structures_grouped = structure_groups(structures, nearby_threshold=5.00)
+
+        # Store the flattened, grouped list for the deletion step
+        manage_id = str(uuid.uuid4())
+        structs_path = os.path.join(UPLOAD_DIR, f"manage_{manage_id}_structs.json")
+        with open(structs_path, "w", encoding="utf-8") as f:
+            json.dump(structures_grouped, f)
+            
+        session['manage_id'] = manage_id
+        session['manage_fname'] = constructions_fname
+        
+        # Further group for the template
+        grouped_for_template = defaultdict(list)
+        for idx, s in enumerate(structures_grouped):
+            group_label = s.get('group_label', f"Group {s.get('group_id', '?')}")
+            grouped_for_template[group_label].append((idx, s))
+
+        return render_template(
+            'manage_structures.html', 
+            grouped_structures=grouped_for_template,
+            structure_count=len(structures_grouped)
+        )
+
+    except Exception as e:
+        flash(f"Error reading your constructions file: {e}", "error")
+        return redirect(url_for('options'))
+
+
+@app.route('/delete_structures', methods=['POST'])
+def delete_structures():
+    zip_filename = session.get('zip_filename')
+    manage_id = session.get('manage_id')
+    constructions_fname = session.get('manage_fname')
+
+    if not all([zip_filename, manage_id, constructions_fname]):
+        flash("Your session has expired or is invalid. Please start over.", "error")
+        return redirect(url_for('index'))
+
+    structs_path = os.path.join(UPLOAD_DIR, f"manage_{manage_id}_structs.json")
+    if not os.path.exists(structs_path):
+        flash("Could not find the original structure data. Please start over.", "error")
+        return redirect(url_for('manage_structures'))
+
+    with open(structs_path, "r", encoding="utf-8") as f:
+        original_structures = json.load(f) # This is the flat list
+
+    # Get the indices to DELETE from the form
+    indices_to_delete = {int(i) for i in request.form.getlist('delete_ids')}
+    
+    # Create a new list containing only the structures we want to KEEP
+    structures_to_keep = [s for i, s in enumerate(original_structures) if i not in indices_to_delete]
+
+    # Re-bucket the KEPT structures by TypeID
+    buckets = defaultdict(list)
+    for s in structures_to_keep:
+        # We don't need the grouping keys anymore, remove them
+        s.pop('group_id', None)
+        s.pop('group_label', None)
+        buckets[s['TypeID']].append(s)
+    
+    max_tid = max(buckets.keys()) if buckets else -1
+    new_structure_list = [buckets.get(i) for i in range(max_tid + 1)]
+    
+    # Read the original constructions file to get the template
+    with zipfile.ZipFile(zip_filename) as zf:
+        raw_constructions = zf.read(constructions_fname).decode('utf-8')
+        constructions_template = json.loads(raw_constructions)
+    
+    # Deep unstringify, replace structures, and deep restringify
+    editable_cdata = deep_unstringify(constructions_template)
+    editable_cdata['Data']['Constructions']['Structures'] = new_structure_list
+    final_data = deep_restringify(editable_cdata, constructions_template)
+    final_json_str = json.dumps(final_data, separators=(',', ':'))
+
+    # --- Output new zip ---
+    tmp_zip_io = io.BytesIO()
+    with zipfile.ZipFile(zip_filename, 'r') as orig_zip, \
+         zipfile.ZipFile(tmp_zip_io, 'w') as new_zip:
+        for item in orig_zip.infolist():
+            if item.filename == constructions_fname:
+                new_zip.writestr(constructions_fname, final_json_str)
+            else:
+                new_zip.writestr(item, orig_zip.read(item.filename))
+    tmp_zip_io.seek(0)
+    
+    flash(f"{len(indices_to_delete)} structures have been successfully deleted!", "success")
+    return send_file(
+        tmp_zip_io,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name="SaveData_Modified.zip"
+    )
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

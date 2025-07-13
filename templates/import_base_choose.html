@@ -64,8 +64,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uploadArea = document.getElementById('baseUploadArea');
     const fileInput = document.getElementById('baseFileInput');
-    const fileInfo = document.getElementById('baseFileInfo');
-    const fileName = document.getElementById('baseFileName');
+    const baseFileInfo = document.getElementById('baseFileInfo');
+    const baseFileName = document.getElementById('baseFileName');
     const uploadForm = document.getElementById('baseUploadForm');
 
     // Prevent default drag behaviors
@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const file = fileInput.files[0];
         if (file) {
             if (file.name.toLowerCase().endsWith('.json')) {
-                fileName.textContent = file.name;
-                fileInfo.style.display = 'block';
+                baseFileName.textContent = file.name;
+                baseFileInfo.style.display = 'block';
                 uploadArea.style.display = 'none';
             } else {
                 alert('Please select a JSON file.');

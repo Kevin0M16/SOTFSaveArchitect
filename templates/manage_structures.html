@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}Manage Your Structures - SOTF Save Architect{% endblock %}
+{% block page_title %}SOTF Save Architect - Manage Your Structures{% endblock %}
+{% block content %}
+<div class="sotf-breadcrumb">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('options') }}">Tools</a></li>
+            <li class="breadcrumb-item active">Manage Structures</li>
+        </ol>
+    </nav>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <form method="post" action="{{ url_for('delete_structures') }}" id="manageForm">
+            <div class="sotf-card">
+                <div class="sotf-card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-check2-square"></i> Select Structures to <strong class="text-danger">DELETE</strong>
+                    </div>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Delete Selected Structures
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if structure_count > 0 %}
+                    <div class="form-check form-check-lg bg-light p-3 rounded mb-3 border">
+                        <input class="form-check-input" type="checkbox" id="selectAllCheckbox">
+                        <label class="form-check-label fw-bold" for="selectAllCheckbox">
+                            Select / Deselect All Structures
+                        </label>
+                    </div>
+
+                    <div class="accordion" id="structureGroupsAccordion">
+                        {% for group_label, members in grouped_structures.items() %}
+                        {% set group_idx = loop.index0 %}
+                        {% set first_pos = members[0][1].get('Position') %}
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ group_idx }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ group_idx }}" aria-expanded="false" aria-controls="collapse{{ group_idx }}">
+                                    <div class="d-flex justify-content-between w-100 align-items-center pe-3">
+                                        <div class="flex-grow-1 text-truncate">
+                                            {{ group_label }}
+                                            {% if first_pos %}
+                                            <span class="text-muted small ms-2 d-none d-md-inline">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                                ({{ first_pos.x|round(2) }}, {{ first_pos.y|round(2) }}, {{ first_pos.z|round(2) }})
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ms-2 text-nowrap">
+                                            <span class="badge bg-secondary">{{ members|length }} total</span>
+                                            <span class="badge bg-danger group-selection-badge" data-group-id="{{ group_idx }}" style="display: none;"></span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse{{ group_idx }}" class="accordion-collapse collapse" aria-labelledby="heading{{ group_idx }}" data-bs-parent="#structureGroupsAccordion">
+                                <div class="accordion-body">
+                                    <div class="form-check border-bottom pb-2 mb-2">
+                                        <input class="form-check-input group-master-checkbox" type="checkbox" id="groupMaster{{ group_idx }}" data-group-id="{{ group_idx }}">
+                                        <label class="form-check-label" for="groupMaster{{ group_idx }}">
+                                            Select / Deselect All in this Group
+                                        </label>
+                                    </div>
+
+                                    {% for idx, s in members %}
+                                    <div class="form-check mb-1 p-2 rounded structure-item-wrapper">
+                                        <input class="form-check-input structure-checkbox" type="checkbox" name="delete_ids" value="{{ idx }}" id="struct{{ idx }}" data-group-id="{{ group_idx }}">
+                                        
+                                        <label class="form-check-label w-100 d-flex align-items-center" for="struct{{ idx }}">
+                                            <div class="me-auto">
+                                                <strong class="me-2">#{{ idx }}</strong>
+                                                <span class="badge badge-sotf-danger">TypeID: {{ s.TypeID }}</span>
+                                            </div>
+                                            <div class="ms-2 text-nowrap">
+                                                <span class="text-muted small">
+                                                    <i class="bi bi-geo-alt-fill"></i>
+                                                    ({{ s.Position.x|default("?")|round(2) }}, {{ s.Position.y|default("?")|round(2) }}, {{ s.Position.z|default("?")|round(2) }})
+                                                </span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <h5 class="text-muted mt-3">No structures found in your save file.</h5>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <div class="sotf-card">
+            <div class="sotf-card-header">
+                <i class="bi bi-info-circle"></i> Instructions
+            </div>
+            <div class="card-body">
+                <p>This page shows all the structures from your save file, grouped by location.</p>
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Warning!</h6>
+                    <p class="mb-0">Structures you select on this page will be <strong>permanently deleted</strong> from your save file. This action cannot be undone.</p>
+                </div>
+                 <ul class="list-unstyled small mt-3">
+                    <li><i class="bi bi-check-circle text-success"></i> Check the box next to any structure or group you wish to delete.</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Use the main "Delete" button when you are finished.</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Always make a backup of your save file first.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('manageForm');
+    if (!form) return;
+
+    const globalMaster = document.getElementById('selectAllCheckbox');
+    const groupMasters = form.querySelectorAll('.group-master-checkbox');
+    const itemCheckboxes = form.querySelectorAll('.structure-checkbox');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    function updateUI() {
+        const selectedCount = form.querySelectorAll('.structure-checkbox:checked').length;
+        
+        // Update main button
+        if (submitBtn) {
+            submitBtn.innerHTML = `<i class="bi bi-trash"></i> Delete ${selectedCount} Selected Structures`;
+            submitBtn.disabled = selectedCount === 0;
+        }
+
+        // Update group badges
+        const groupIds = [...new Set([...itemCheckboxes].map(cb => cb.dataset.groupId))];
+        groupIds.forEach(id => {
+            const badge = form.querySelector(`.group-selection-badge[data-group-id="${id}"]`);
+            if (!badge) return;
+            const groupCheckedCount = form.querySelectorAll(`.structure-checkbox[data-group-id="${id}"]:checked`).length;
+            if (groupCheckedCount > 0) {
+                badge.textContent = `${groupCheckedCount} selected`;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+
+        // Update group master checkboxes
+        groupMasters.forEach(master => {
+            const groupId = master.dataset.groupId;
+            const groupItems = form.querySelectorAll(`.structure-checkbox[data-group-id="${groupId}"]`);
+            if (groupItems.length === 0) return;
+            
+            const checkedInGroup = form.querySelectorAll(`.structure-checkbox[data-group-id="${groupId}"]:checked`).length;
+            if (checkedInGroup === 0) {
+                master.checked = false;
+                master.indeterminate = false;
+            } else if (checkedInGroup === groupItems.length) {
+                master.checked = true;
+                master.indeterminate = false;
+            } else {
+                master.checked = false;
+                master.indeterminate = true;
+            }
+        });
+
+        // Update global master checkbox
+        const totalItems = itemCheckboxes.length;
+        if (totalItems > 0) {
+            if (selectedCount === 0) {
+                globalMaster.checked = false;
+                globalMaster.indeterminate = false;
+            } else if (selectedCount === totalItems) {
+                globalMaster.checked = true;
+                globalMaster.indeterminate = false;
+            } else {
+                globalMaster.checked = false;
+                globalMaster.indeterminate = true;
+            }
+        }
+    }
+    
+    // Event listeners
+    globalMaster.addEventListener('click', function() {
+        itemCheckboxes.forEach(item => item.checked = this.checked);
+        updateUI();
+    });
+
+    groupMasters.forEach(master => {
+        master.addEventListener('click', function() {
+            const groupId = this.dataset.groupId;
+            form.querySelectorAll(`.structure-checkbox[data-group-id="${groupId}"]`).forEach(item => item.checked = this.checked);
+            updateUI();
+        });
+    });
+
+    itemCheckboxes.forEach(item => {
+        item.addEventListener('change', updateUI);
+    });
+
+    // Confirmation on submit
+    form.addEventListener('submit', function(e) {
+        const selectedCount = form.querySelectorAll('.structure-checkbox:checked').length;
+        if (selectedCount > 0) {
+            const confirmation = confirm(`Are you sure you want to permanently delete ${selectedCount} structure(s)? This cannot be undone.`);
+            if (!confirmation) {
+                e.preventDefault();
+            }
+        } else {
+            e.preventDefault();
+            alert("No structures were selected for deletion.");
+        }
+    });
+
+    // Initial state
+    updateUI();
+});
+</script>
+{% endblock %}
