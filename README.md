@@ -64,7 +64,7 @@ This method lets you run the editor anywhere without downloading any source code
 
 4.  Start the application!
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
 
 5.  The editor is now running at **`http://localhost:5000`**.
