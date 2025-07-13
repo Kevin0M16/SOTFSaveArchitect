@@ -14,7 +14,7 @@
 #    Run this command in your terminal, replacing 'YourNewSecurePassword'
 #    with a strong, unique password.
 #
-#    docker run --rm authelia/authelia:latest authelia hash-password 'YourNewSecurePassword'
+#    docker run --rm authelia/authelia:latest authelia crypto hash generate argon2 --password 'YourNewSecurePassword'
 #
 # 3. REPLACE THE PLACEHOLDER:
 #    Copy the entire output from the command above (it will start with '$argon2id...')
