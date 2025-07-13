@@ -9,8 +9,13 @@ A powerful, web-based save editor for the game *Sons of the Forest*. This tool a
 | ![img1](img/Screenshot1.png) | ![img2](img/Screenshot2.png) |
 |------------------------------|------------------------------|
 | ![img3](img/Screenshot3.png) | ![img4](img/Screenshot4.png) |
-|------------------------------|------------------------------|
 
+---
+
+**Update v1.01**
+- Added SaveData and game stat badges.
+- Added Manage Structures to edit existing structures.
+  
 ---
 
 ## 🚀 Installation & Setup
